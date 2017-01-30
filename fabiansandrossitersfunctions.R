@@ -654,3 +654,7 @@ quality <- function(CM){
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   return(preds)
 }
+Modus <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
