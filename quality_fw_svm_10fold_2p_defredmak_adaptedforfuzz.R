@@ -43,7 +43,7 @@ mymodeldata <-data[fullmodelcols]
 #########################################################################################
 paramsetnames = paramsetnames
 paramsets = paramsets
-n=4
+n=6
 paramsets[[1]] <- allcurvcols_plusplus
 tpiterraintophat <- c(unlist(paramsets[2]),unlist(paramsets[7]),unlist(paramsets[9]))
 paramsets[[10]] <- tpiterraintophat
@@ -64,7 +64,7 @@ newparamsets <- list(paramsets[[1]],paramsets[[3]],paramsets[[4]],paramsets[[10]
 #########################################  
   ############################################
 #########################################  
-for (p in newparamsets[4:6]){
+for (p in newparamsets[6]){
 predset_name <- newparamsetnames[n]
 preds <- unlist(p)
 withna <- vector()
