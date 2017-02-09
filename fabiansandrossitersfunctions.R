@@ -658,3 +658,42 @@ Modus <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
 }
+
+  evaluateforwardCV_anyerror <-function(mypath, kk=1:10, endround=5,yrange=c(0.35,0.70),error,geheim) {
+    xrange <- c(1,endround)
+    yrange=yrange
+    plot(xrange,yrange,type="n",xlab="steps",ylab="prediction-error")
+    colors=rainbow(max(kk))
+    vcpreds <- data.frame(1:endround)
+    for (k in kk){
+      load(file=paste(mypath,"/k",k,"_round_",endround,".RData",sep=""))
+      lines(result_df$tt,result_df[[error]],type="b",col=colors[k])
+      vcpreds[[k]] <- result_df[[geheim]]
+    }
+    vcpreds["meanprederror"] <- apply(vcpreds,1,mean,na.rm=TRUE)
+    vcpreds["standard.error"] <- apply(vcpreds,1,function(x) { sd(x,na.rm = TRUE)/sqrt(sum(!is.na(x)))})
+    vcpreds["se_lower"] <- vcpreds$meanprederror - 2*vcpreds$standard.error
+    vcpreds["se_upper"] <- vcpreds$meanprederror + 2*vcpreds$standard.error
+    cn <- ncol(vcpreds)
+    lines(1:endround,vcpreds$meanprederror,type="b",col="red",lwd=3)
+    matlines(vcpreds[,cn-1:cn],col="black",lty=2)
+    one.se.rule <- vcpreds[vcpreds$meanprederror==min(vcpreds$meanprederror),"standard.error"] + min(vcpreds$meanprederror)
+    abline(h=one.se.rule,lwd=3)
+    predictor_df <- data.frame(row.names=1:endround)
+    allchosen <- vector()
+    for (k in kk){
+      kname=paste("k",k)
+      load(file=paste(mypath,"/k",k,"_round_",endround,".RData",sep=""))
+      predictor_df[[kname]]<- result_df$metric
+      allchosen <-c(allchosen,as.character(result_df$metric))
+    }
+    print(predictor_df)
+    #as.data.frame(table(allchosen))[order(as.data.frame(table(allchosen))$Freq,decreasing=TRUE),]
+    #print(table(allchosen))
+    chosen_df <- as.data.frame(table(allchosen))
+    chosen_df <- chosen_df[chosen_df$Freq > 1,]
+    chosen_df <- chosen_df[order(chosen_df$Freq,decreasing = TRUE),]
+    par(mar=c(10,2,2,2))
+    barplot(height=chosen_df$Freq,names.arg = chosen_df$allchosen,las=2,cex.names=0.6)
+    return(chosen_df)
+  }
