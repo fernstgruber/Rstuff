@@ -634,7 +634,7 @@ quality <- function(CM){
   return(mean_quality)
 }
 
-  predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend){
+predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
   require(e1071)
   modeldata_new <- merge(modeldata,legend,all.x=T)
   dependent_new <- names(legend)[1]
@@ -652,7 +652,7 @@ quality <- function(CM){
   summary.tau(tau(CM))
   print(paste("The quality of the modeled TP is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
-  return(preds)
+  if(doreturn==TRUE) return(preds)
 }
 Modus <- function(x) {
   ux <- unique(x)
