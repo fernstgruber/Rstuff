@@ -147,7 +147,7 @@ for(k in 1:10){
     prederror=mean(ktestdata[[dependent]] != predictions)
     result_df[t,"geheimerprederror"] <- prederror
     CM <- table(predictions,ktestdata[[dependent]])
-    result_df[t,"geheimercv_qualityerror"] <-  quality(CM)
+    result_df[t,"geheimercv_qualityerror"] <-  1-quality(CM)
     print(paste("geheimerprederror = ",prederror,sep=""))
     testdatatable <- table(ktestdata[[dependent]])
     traindatatable<- table(kmodeldata[[dependent]])
