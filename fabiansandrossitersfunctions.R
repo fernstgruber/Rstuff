@@ -697,3 +697,24 @@ Modus <- function(x) {
     barplot(height=chosen_df$Freq,names.arg = chosen_df$allchosen,las=2,cex.names=0.6)
     return(chosen_df)
   }
+predict_radial_newlegend_full_naomit <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
+  require(e1071)
+  modeldata_new <- merge(modeldata,legend,all.x=T)
+  dependent_new <- names(legend)[1]
+  modeldata_new[[dependent_new]] <-droplevels(modeldata_new[[dependent_new]]) 
+  mymodeldata <- modeldata_new[c(dependent_new,predictors)]
+  mymodeldata <- na.omit(mymodeldata)
+  f <- paste(dependent_new,"~.")
+  fit <- do.call("svm",list(as.formula(f),mymodeldata,cross=10,kernel="radial"))
+  cverror = 1-(fit$tot.accuracy)/100
+  print(paste("10fold cv-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
+  mymodeldatana <- na.omit(mymodeldata)
+  preds <- predict(fit,mymodeldatana)
+  CM <- table(preds,mymodeldatana[[dependent_new]])
+  print(CM)
+  summary.kappa(kappa(CM))
+  summary.tau(tau(CM))
+  print(paste("The quality of the modeled TP is ",quality(CM)))
+  print(paste("#########  Cramer's V = ",Cramer(CM)))
+  if(doreturn==TRUE) return(preds)
+}
