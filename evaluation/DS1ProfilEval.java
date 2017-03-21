@@ -79,15 +79,15 @@ public class DS1ProfilEval {
                 || h.getAttributeValue("bezeichnung").toUpperCase().startsWith("T")) {
           this.oberboden.add(h);
         }
-      }
-    } else if (bodentyp >= 1700 && bodentyp <= 1799) {
-      log.add("   Schüttungsboden! Es werden M* Horizonte gesucht");
-      // Alle 'M' Horizonte finden und der Liste hinzufügen
-      for (CmsHorizont h : this.horizonte) {
-        if (h.getAttributeValue("bezeichnung").toUpperCase().startsWith("M")) {
-          this.oberboden.add(h);
-        }
-      }
+      }  //M#Horizontabfrage wird weggelassen da in der öst. Systematik M der Wurzelfilz ist und wir Arig für umgelagerten A-Horzont verwenden
+//    } else if (bodentyp >= 1700 && bodentyp <= 1799) {
+//      log.add("   Schüttungsboden! Es werden M* Horizonte gesucht");
+//      // Alle 'M' Horizonte finden und der Liste hinzufügen
+//      for (CmsHorizont h : this.horizonte) {
+//        if (h.getAttributeValue("bezeichnung").toUpperCase().startsWith("M")) {
+//          this.oberboden.add(h);
+//        }
+//      }
     } else {
       log.add("   Terrestrischer Boden! Es werden A* Horizonte gesucht");
       // Alle 'A' Horizonte finden und der Liste hinzufügen
@@ -131,14 +131,14 @@ public class DS1ProfilEval {
           this.unterboden.add(h);
         }
       }
-    } else if (bodentypCode >= 1700 && bodentypCode <= 1799) {
-      log.add("   Schüttungsboden! Es werden Horizonte gesucht, die keine M* Horizonte sind, deren Untergrenze sich aber noch im Wurzelraum befindet (Tiefe <= Wurzeltiefe)");
-      for (CmsHorizont h : this.horizonte) {
-        if (!h.getAttributeValue("bezeichnung").toUpperCase().startsWith("M")
-                && (h.getAttributeValueInt("tiefe") >= 0 && h.getAttributeValueInt("tiefe") <= wurzelTiefe)) {
-          this.unterboden.add(h);
-        }
-      }
+    //} else if (bodentypCode >= 1700 && bodentypCode <= 1799) { //siehe oben bei Oberbeodendefinition
+    //  log.add("   Schüttungsboden! Es werden Horizonte gesucht, die keine M* Horizonte sind, deren Untergrenze sich aber noch im Wurzelraum befindet (Tiefe <= Wurzeltiefe)");
+    //  for (CmsHorizont h : this.horizonte) {
+    //    if (!h.getAttributeValue("bezeichnung").toUpperCase().startsWith("M")
+    //            && (h.getAttributeValueInt("tiefe") >= 0 && h.getAttributeValueInt("tiefe") <= wurzelTiefe)) {
+    //      this.unterboden.add(h);
+    //    }
+    //  }
     } else {
       log.add("   Terrestricher Boden! Es werden Horizonte gesucht, die keine M* Horizonte sind, deren Untergrenze sich aber noch im Wurzelraum befindet (Tiefe <= Wurzeltiefe)");
       for (CmsHorizont h : this.horizonte) {
@@ -598,12 +598,12 @@ public class DS1ProfilEval {
         if (list.contains(100L)) {
           log.add("   -> A1.1");
           result = 3;
-        } else if (list.contains(200L) || list.contains(2990L)) {
+        } else if (list.contains(200L) || list.contains(2990L) || list.contains(500L)) { //Hier noch Sonderkultur/Weinbau integriert da sonst keine Bewertung stattfindet. 
           if (feuchte == 260) {
             log.add("   -> A1.3");
             result = 3;
           } else {
-            log.add("   Grünland!");
+            log.add("   Grünland oder Sonderkultur!"); //Siehe oben
             if (bodenart < 0) {
               log.add("   FEHLER => Bodenart für Referenz-Horizont nicht vorhanden!");
               return;
@@ -875,7 +875,7 @@ public class DS1ProfilEval {
     }
 
     log.add("   C) Durchlüftung");
-    float sx07 = this.profil.getAttributeValueFloat("Sx07_LKoben");
+    float sx07 = this.profil.getAttributeValueFloat("Sx06a_LKwe"); //hier war vorher LKOBEN, in der Tabelle in Anleitung wird aber LKwe verwendet, variablenname wurde aber beibehalten
     if (sx07 < 0) {
       log.add("   ACHTUNG => Komplexer Parameter fehlt! -> " + this.profil.getAttributeLabel("Sx07_LKoben"));
       log.add("   HINWEIS => C wird nur bewertet, wenn dieser Parameter vorhanden ist!");
@@ -1460,9 +1460,10 @@ public class DS1ProfilEval {
 
     boolean festgestein = false;
     boolean grundwasser = false;
+    float gruendigkeit = this.profil.getAttributeValueFloat("gruendigkeit_wert");
     for (CmsHorizont h : this.horizonte) {
-      if (h.getAttributeValueFloat("Px02_Sk") == 100) {
-        log.add("   Festgestein!!");
+      if ((h.getAttributeValueFloat("Px02_Sk") == 100) &&  (gruendigkeit < 25.0f)) { // hier noch zusätzliche Bedingung eingebaut weil nur Festgestein eher sinnlos
+        log.add("      Festgestein im Untergrund und Gründigkeit kleiner 25 cm!");
         festgestein = true;
       }
     }
@@ -1848,7 +1849,7 @@ public class DS1ProfilEval {
           cdrel = 4.0f;
         } else if (ph >= 6.3f && ph < 6.7f) {
           cdrel = 4.5f;
-        } else if (ph >= 6.7f && ph <= 8.0f) {
+        } else if (ph >= 6.7f ) { //sonst wird bei größer pH 8 kein Wert vergeben
           cdrel = 5.0f;
         }
 
@@ -1920,7 +1921,7 @@ public class DS1ProfilEval {
           log.add("   HINWEIS => Bewertung wird genauer, wenn dieser Parameter vorhanden ist");
         }
 
-        sum += (cdrel * h.getThickness() / sumThickness);
+        sum += (cdrel * h.getThickness() / 100.0f);
       }
       log.add("   Summe (Cd-rel) für das gesamte Profil -> " + sum);
       if (sum < 1.5) {
@@ -2357,20 +2358,20 @@ public class DS1ProfilEval {
       float orgRelHumus = -1;
       String bezeichnung = h.getAttributeValue("bezeichnung");
       log.add("   '" + bezeichnung + "'-Horizont");
-      
+      // Hier Moore und Torfe eingebaut, allerdings passen die zersetzungklassen der Elemente nicht mit der Anleitung zusammen
       if(bezeichnung.contains("T")){
       log.add("'Torfhorizont gefunden! Org_rel_hum anhand von Torfzersetzungsstufe ");
       if(!h.hasAttributeValue("torf_zersetzung")){
-          log.add(" Fehler! Torfzersetzungsgrad   ");
+          log.add(" Fehler! Torfzersetzungsgrad  fehlt ");
       } else{
       long zersetzung =((KeyAttribute) h.getAttribute("torf_zersetzung")).getId();
       float thickness = h.getThickness();
-      if(zersetzung == 1){
-          orgRelHumus = 3.0f;
-      } else if(zersetzung == 1){
+      if(zersetzung == 1 || zersetzung == 2){
+          orgRelHumus = 2.0f;
+      } else if(zersetzung == 3){
           orgRelHumus = 2.5f;
-      } else if(zersetzung == 1){
-          orgRelHumus = 2.0f;          
+      } else if(zersetzung == 4 || zersetzung == 5){
+          orgRelHumus = 3.0f;          
       }
       orgRelSum += orgRelHumus*thickness;
       maechtigkeit += thickness; 
@@ -2378,7 +2379,7 @@ public class DS1ProfilEval {
       } else{
       // Mittlere Bindungsstärke durch den Humusanteil
       
-      // TODO : Überprüfen Moorböden und Torfe -  MIT FEB2017 versucht
+      // TODO : Überprüfen Moorböden und Torfe -  MIT FEB2017 versucht (fg)
       float px01 = h.getAttributeValueFloat("Px01_Hu");
       if (px01 < 0) {
         log.add("   FEHLER => Komplexer Parameter fehlt! -> '" + bezeichnung + "': " + h.getAttributeLabel("Px01_Hu"));
@@ -2577,6 +2578,7 @@ public class DS1ProfilEval {
       }
 
       float swAustausch = sickerwasser / sx05;
+      log.add("   Jährliche Austauschhäufigkeit -> " +swAustausch);
 
       if (swAustausch >= 2.5) {
         result = 5;
@@ -2695,13 +2697,13 @@ public class DS1ProfilEval {
         log.add("   HINWEIS => Bewertung wird genauer wenn dieser Parameter vorhanden ist!");
       } else if (humusform == 110 || humusform == 112 || humusform == 114 || humusform == 210) {
         log.add("   Mull!");
-        humusPuff += 61 * 0.07 * maechtigkeit * 1000;
+        humusPuff += 61 * 0.07 * maechtigkeit * 10; //wir glauben dass sich die Bayern hier mir den Einheiten vertan haben
       } else if (humusform == 130 || humusform == 230) {
         log.add("   Rohhumus!");
-        humusPuff += 32 * 0.20 * maechtigkeit * 1000; //0.25 passt nicht zu Tabelle in Anleitung u BayGLA, daher auf 0.2 geändert
+        humusPuff += 32 * 0.20 * maechtigkeit * 10; //0.25 passt nicht zu Tabelle in Anleitung u BayGLA, daher auf 0.2 geändert
       } else if (humusform == 120 || humusform == 220) {
         log.add("   Moder!");
-        humusPuff += 39 * 0.13 * maechtigkeit * 1000;
+        humusPuff += 39 * 0.13 * maechtigkeit * 10;
       }
     }
 

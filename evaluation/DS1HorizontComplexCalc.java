@@ -1573,7 +1573,7 @@ public class DS1HorizontComplexCalc {
         if ((gefuegeCode == 470 || gefuegeCode == 450) && category == 1) {
             kf = 300;
             log.add("   Lockergelagerter Horizont!");
-            String gefuegeStr = this.horizont.getApplication().getKeytable("gefuege").getTerm(bodenart, horizont.getUser().getCurrentLanguage());
+            String gefuegeStr = this.horizont.getApplication().getKeytable("gefuege").getTerm(gefuegeCode, horizont.getUser().getCurrentLanguage()); //hier war vorher noch die Variable bodenart
             log.add("   -> " + gefuegeStr);
             log.add("   Korrigierter kf-Wert -> " + kf + " cm/d");
         }
