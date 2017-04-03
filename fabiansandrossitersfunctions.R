@@ -718,3 +718,13 @@ predict_radial_newlegend_full_naomit <- function(modeldata,dependent,predictors,
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
 }
+
+  sqliteGRASS <- function(location,mapset,vector){
+ require(RSQLite)
+ drv <- dbDriver("SQLite")
+ grass <-"/home/fabs/Data/GRASSDATA/"
+ con <- dbConnect(drv, dbname = paste(grass,location,"/",mapset,"/sqlite/sqlite.db",sep=""))
+ statement= paste("SELECT * FROM '",as.character(vector),"'",sep="")
+ df<- dbGetQuery(con,statement)
+ return(df)
+}
