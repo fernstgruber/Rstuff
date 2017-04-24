@@ -728,3 +728,12 @@ predict_radial_newlegend_full_naomit <- function(modeldata,dependent,predictors,
  df<- dbGetQuery(con,statement)
  return(df)
 }
+
+sqlite_df <- function(dbpath,vector){
+  require(RSQLite)
+  drv <- dbDriver("SQLite")
+  con <- dbConnect(drv, dbname = dbpath)
+  statement= paste("SELECT * FROM '",as.character(vector),"'",sep="")
+  df<- dbGetQuery(con,statement)
+  return(df)
+}
