@@ -687,6 +687,7 @@ Modus <- function(x) {
       predictor_df[[kname]]<- result_df$metric
       allchosen <-c(allchosen,as.character(result_df$metric))
     }
+    print(paste("Prediction error at end is: ",vcpreds[,"meanprederror"]))
     print(predictor_df)
     #as.data.frame(table(allchosen))[order(as.data.frame(table(allchosen))$Freq,decreasing=TRUE),]
     #print(table(allchosen))
