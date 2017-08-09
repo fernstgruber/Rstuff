@@ -646,6 +646,7 @@ predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,ka
   print(CM)
   print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
   if(kappasum==T) print(summary.kappa(kappa(CM)))
+  print(paste("Tau overall = ",tau(CM)$tau))
   if(tausum == T) print(summary.tau(tau(CM)))
   print(paste("The quality of the modeled TP is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
