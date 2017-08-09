@@ -634,7 +634,7 @@ predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,ka
   if(doreturn==TRUE) return(preds)
 }
 
-predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset){
+predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata){
   require(randomForest)
   fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,paramsets[[pset]])]))
 print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullmodel$err.rate[nrow(fullmodel$err.rate),1]))
@@ -654,6 +654,11 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   print(paste("The quality is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
+   altmodeldata <- na.omit(altdata[c(dependent,predictors)])
+  altpreddata<-altmodeldata[predictors]
+  altpreds <- predict(fit,altpreddata)
+  ACM <- table(altpreds, altmodeldata[[dependent]])
+  print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
 }
 
 predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
