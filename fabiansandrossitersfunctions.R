@@ -634,6 +634,28 @@ predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,ka
   if(doreturn==TRUE) return(preds)
 }
 
+predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset){
+  require(randomForest)
+  fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,paramsets[[pset]])]))
+print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullmodel$err.rate[nrow(fullmodel$err.rate),1]))
+  mymodeldata <- modeldata[c(dependent,predictors)]
+  f <- paste(dependent,"~.")
+  fit <- do.call("randomForest",list(as.formula(f),mymodeldata))
+  cverror =  fit$err.rate[nrow(fit$err.rate),1]
+  print(paste("OOB-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
+  preddata <- mymodeldata[,!names(mymodeldata)%in% c(dependent)]
+  preds <- predict(fit,preddata)
+  CM <- table(preds,mymodeldata[[dependent]])
+  print(CM)
+  print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
+  if(kappasum==T) print(summary.kappa(kappa(CM)))
+  print(paste("Tau overall = ",tau(CM)$tau))
+  if(tausum == T) print(summary.tau(tau(CM)))
+  print(paste("The quality is ",quality(CM)))
+  print(paste("#########  Cramer's V = ",Cramer(CM)))
+  if(doreturn==TRUE) return(preds)
+}
+
 predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
   require(e1071)
   modeldata_new <- merge(modeldata,legend,all.x=T)
