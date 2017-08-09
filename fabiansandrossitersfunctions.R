@@ -661,6 +661,21 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
 }
 
+importance_ranfor_pset <- function(modeldata,dependent,pset,altdata){
+  require(randomForest)
+  fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,paramsets[[pset]])]))
+print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullmodel$err.rate[nrow(fullmodel$err.rate),1]))
+ importance <- as.data.frame(fullmodel$importance)
+importance$parameters <- row.names(importance)
+importance <- importance[order(importance$MeanDecreaseGini,decreasing = T),]
+print(importance[1:10,])
+  altmodeldata <- na.omit(altdata[c(dependent,predictors)])
+  altpreddata<-altmodeldata[paramsets[[pset]]]
+  altpreds <- predict(fullmodel,altpreddata)
+  ACM <- table(altpreds, altmodeldata[[dependent]])
+  print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
+}
+
 predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
   require(e1071)
   modeldata_new <- merge(modeldata,legend,all.x=T)
