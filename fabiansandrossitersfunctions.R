@@ -634,6 +634,22 @@ quality <- function(CM){
   return(mean_quality)
 }
 
+predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE){
+  mymodeldata <- modeldata[c(dependent,predictors)]
+  f <- paste(dependent,"~.")
+  fit <- do.call("svm",list(as.formula(f),mymodeldata,cross=10,kernel="radial"))
+  cverror = 1-(fit$tot.accuracy)/100
+  print(paste("10fold cv-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
+  preds <- predict(fit,mymodeldata)
+  CM <- table(preds,mymodeldata[[dependent]])
+  print(CM)
+  summary.kappa(kappa(CM))
+  summary.tau(tau(CM))
+  print(paste("The quality of the modeled TP is ",quality(CM)))
+  print(paste("#########  Cramer's V = ",Cramer(CM)))
+  if(doreturn==TRUE) return(preds)
+  }
+
 predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
   require(e1071)
   modeldata_new <- merge(modeldata,legend,all.x=T)
