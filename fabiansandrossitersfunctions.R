@@ -635,6 +635,7 @@ quality <- function(CM){
 }
 
 predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE){
+  require(e1071)
   mymodeldata <- modeldata[c(dependent,predictors)]
   f <- paste(dependent,"~.")
   fit <- do.call("svm",list(as.formula(f),mymodeldata,cross=10,kernel="radial"))
@@ -648,7 +649,7 @@ predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE){
   print(paste("The quality of the modeled TP is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
-  }
+}
 
 predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
   require(e1071)
