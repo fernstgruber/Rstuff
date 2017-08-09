@@ -634,7 +634,7 @@ quality <- function(CM){
   return(mean_quality)
 }
 
-predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE){
+predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,kappasum=FALSE,tausum=FALSE){
   require(e1071)
   mymodeldata <- modeldata[c(dependent,predictors)]
   f <- paste(dependent,"~.")
@@ -644,8 +644,9 @@ predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE){
   preds <- predict(fit,mymodeldata)
   CM <- table(preds,mymodeldata[[dependent]])
   print(CM)
-  summary.kappa(kappa(CM))
-  summary.tau(tau(CM))
+  print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
+  if(kappasum==T) print(summary.kappa(kappa(CM)))
+  if(tausum == T) print(summary.tau(tau(CM)))
   print(paste("The quality of the modeled TP is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
