@@ -709,6 +709,7 @@ predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,ka
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
 }
+
 predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=FALSE,kappasum=FALSE,tausum=FALSE,alttest=TRUE,altdata){
   require(e1071)
   modeldata_new <- merge(modeldata,legend,all.x=T)
