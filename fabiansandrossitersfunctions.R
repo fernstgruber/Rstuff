@@ -709,7 +709,7 @@ predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,ka
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
 }
-predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=FALSE,kappasum=FALSE,tausum=FALSE){
+predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=FALSE,kappasum=FALSE,tausum=FALSE,alttest=TRUE,altdata){
   require(e1071)
   modeldata_new <- merge(modeldata,legend,all.x=T)
   dependent_new <- names(legend)[1]
@@ -730,7 +730,23 @@ predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,
   print(paste("The quality is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
+    if(alttest==TRUE){
+    altdata <- merge(altdata,legend,all.x=T)
+    altmodeldata <- na.omit(altdata[c(dependent_new,predictors)])
+    altpreddata<-altmodeldata[predictors]
+    altpreds <- predict(fit,altpreddata)
+    ACM <- table(altpreds, altmodeldata[[dependent_new]])
+    print(ACM)
+    print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent_new]])))
+    print(paste("Kappa overall = ",kappa(ACM)$sum.kappa))
+    if(kappasum==T) print(summary.kappa(kappa(ACM)))
+    print(paste("Tau overall = ",tau(ACM)$tau))
+    if(tausum == T) print(summary.tau(tau(ACM)))
+    print(paste("The quality is ",quality(ACM)))
+    print(paste("#########  Cramer's V = ",Cramer(ACM)))
+  }
 }
+
 Modus <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
