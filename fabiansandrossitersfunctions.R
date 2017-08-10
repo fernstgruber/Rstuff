@@ -669,7 +669,7 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
 importance$parameters <- row.names(importance)
 importance <- importance[order(importance$MeanDecreaseGini,decreasing = T),]
 print(importance[1:10,])
-  altmodeldata <- na.omit(altdata[c(dependent,predictors)])
+  altmodeldata <- na.omit(altdata[c(dependent,paramsets[[pset]])])
   altpreddata<-altmodeldata[paramsets[[pset]]]
   altpreds <- predict(fullmodel,altpreddata)
   ACM <- table(altpreds, altmodeldata[[dependent]])
