@@ -589,8 +589,6 @@ predict_radial_newlegend_truekappa <- function(modeldata,dependent,predictors,le
   return(preds)
 }
 
-
-
 quality <- function(CM){
   #convert both data frames and vectors to matrices
   cmx<-as.matrix(CM)
@@ -613,25 +611,6 @@ quality <- function(CM){
   mean_quality <- sum(quality,na.rm = T)/length(quality)
   print(paste("mean quality = ",mean_quality))
   return(mean_quality)
-}
-
-predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,kappasum=FALSE,tausum=FALSE){
-  require(e1071)
-  mymodeldata <- modeldata[c(dependent,predictors)]
-  f <- paste(dependent,"~.")
-  fit <- do.call("svm",list(as.formula(f),mymodeldata,cross=10,kernel="radial"))
-  cverror = 1-(fit$tot.accuracy)/100
-  print(paste("10fold cv-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
-  preds <- predict(fit,mymodeldata)
-  CM <- table(preds,mymodeldata[[dependent]])
-  print(CM)
-  print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
-  if(kappasum==T) print(summary.kappa(kappa(CM)))
-  print(paste("Tau overall = ",tau(CM)$tau))
-  if(tausum == T) print(summary.tau(tau(CM)))
-  print(paste("The quality is ",quality(CM)))
-  print(paste("#########  Cramer's V = ",Cramer(CM)))
-  if(doreturn==TRUE) return(preds)
 }
 
 predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata){
@@ -676,7 +655,25 @@ print(importance[1:10,])
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
 }
 
-predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
+predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,kappasum=FALSE,tausum=FALSE){
+  require(e1071)
+  mymodeldata <- modeldata[c(dependent,predictors)]
+  f <- paste(dependent,"~.")
+  fit <- do.call("svm",list(as.formula(f),mymodeldata,cross=10,kernel="radial"))
+  cverror = 1-(fit$tot.accuracy)/100
+  print(paste("10fold cv-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
+  preds <- predict(fit,mymodeldata)
+  CM <- table(preds,mymodeldata[[dependent]])
+  print(CM)
+  print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
+  if(kappasum==T) print(summary.kappa(kappa(CM)))
+  print(paste("Tau overall = ",tau(CM)$tau))
+  if(tausum == T) print(summary.tau(tau(CM)))
+  print(paste("The quality is ",quality(CM)))
+  print(paste("#########  Cramer's V = ",Cramer(CM)))
+  if(doreturn==TRUE) return(preds)
+}
+predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,doreturn=FALSE,kappasum=FALSE,tausum=FALSE){
   require(e1071)
   modeldata_new <- merge(modeldata,legend,all.x=T)
   dependent_new <- names(legend)[1]
@@ -690,9 +687,11 @@ predict_radial_newlegend_full <- function(modeldata,dependent,predictors,legend,
   preds <- predict(fit,mymodeldata)
   CM <- table(preds,mymodeldata[[dependent_new]])
   print(CM)
-  summary.kappa(kappa(CM))
-  summary.tau(tau(CM))
-  print(paste("The quality of the modeled TP is ",quality(CM)))
+  print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
+  if(kappasum==T) print(summary.kappa(kappa(CM)))
+  print(paste("Tau overall = ",tau(CM)$tau))
+  if(tausum == T) print(summary.tau(tau(CM)))
+  print(paste("The quality is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
 }
