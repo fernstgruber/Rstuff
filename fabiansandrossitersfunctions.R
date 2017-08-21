@@ -640,7 +640,7 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
 }
 
-predict_ranfor_newlegend_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata,legend){
+predict_ranfor_newlegend_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,altdata,legend){
   require(randomForest)
  modeldata_new <- merge(modeldata,legend,all.x=T)
   dependent_new <- names(legend)[1]
