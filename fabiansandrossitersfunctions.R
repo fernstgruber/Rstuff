@@ -676,6 +676,44 @@ predict_ranfor_newlegend_full <- function(modeldata,dependent,predictors,doretur
   print(paste("#########  Cramer's V = ",Cramer(ACM)))
 }
 
+predict_ranfor_newlegend_full_naproblem <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,altdata,legend){
+  require(randomForest)
+ modeldata_new <- merge(modeldata,legend,all.x=T)
+  dependent_new <- names(legend)[1]
+  modeldata_new[[dependent_new]] <-droplevels(modeldata_new[[dependent_new]]) 
+  mymodeldata <- modeldata_new[c(dependent_new,predictors)]
+  mymodeldata <- na.omit(mymodeldata)
+  f <- paste(dependent_new,"~.")
+  fit <- do.call("randomForest",list(as.formula(f),mymodeldata))
+  cverror =  fit$err.rate[nrow(fit$err.rate),1]
+  print(paste("OOB-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
+  preddata <- mymodeldata[,!names(mymodeldata)%in% c(dependent_new,dependent)]
+  preds <- predict(fit,preddata)
+  CM <- table(preds,mymodeldata[[dependent_new]])
+  #print(CM)
+  print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
+  if(kappasum==T) print(summary.kappa(kappa(CM)))
+  print(paste("Tau overall = ",tau(CM)$tau))
+  if(tausum == T) print(summary.tau(tau(CM)))
+  print(paste("The quality is ",quality(CM)))
+  print(paste("#########  Cramer's V = ",Cramer(CM)))
+  if(doreturn==TRUE) return(preds)
+  altdataleg <- merge(altdata,legend,all.x=T)
+   altmodeldata <- na.omit(altdataleg[c(dependent_new,predictors)])
+  altpreddata<-altmodeldata[predictors]
+  altpreds <- predict(fit,altpreddata)
+  ACM <- table(altpreds, altmodeldata[[dependent_new]])
+  print(ACM)
+  print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent_new]])))
+  print(paste("Kappa overall = ",kappa(ACM)$sum.kappa))
+  if(kappasum==T) print(summary.kappa(kappa(ACM)))
+  print(paste("Tau overall = ",tau(ACM)$tau))
+  if(tausum == T) print(summary.tau(tau(ACM)))
+  print(paste("The quality is ",quality(ACM)))
+  print(paste("#########  Cramer's V = ",Cramer(ACM)))
+}
+
+
 importance_ranfor_pset <- function(modeldata,dependent,pset,altdata){
   require(randomForest)
   fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,paramsets[[pset]])]))
