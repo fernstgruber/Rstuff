@@ -726,6 +726,7 @@ print(importance[1:10,])
   altpreddata<-altmodeldata[paramsets[[pset]]]
   altpreds <- predict(fullmodel,altpreddata)
   ACM <- table(altpreds, altmodeldata[[dependent]])
+  print(ACM)
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
 }
 
