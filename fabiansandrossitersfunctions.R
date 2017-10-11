@@ -929,7 +929,7 @@ predict_radial_newlegend_full_naomit <- function(modeldata,dependent,predictors,
   if(doreturn==TRUE) return(preds)
 }
 
-  sqliteGRASS <- function(location,mapset,vector){
+ sqliteGRASS_lenny <- function(location,mapset,vector){
  require(RSQLite)
  drv <- dbDriver("SQLite")
  grass <-"/home/fabs/Data/GRASSDATA/"
@@ -939,6 +939,15 @@ predict_radial_newlegend_full_naomit <- function(modeldata,dependent,predictors,
  return(df)
 }
 
+ sqliteGRASS_delilah <- function(location,mapset,vector){
+ require(RSQLite)
+ drv <- dbDriver("SQLite")
+ grass <-"/media/fabs/Volume/Data/GRASSDATA/"
+ con <- dbConnect(drv, dbname = paste(grass,location,"/",mapset,"/sqlite/sqlite.db",sep=""))
+ statement= paste("SELECT * FROM '",as.character(vector),"'",sep="")
+ df<- dbGetQuery(con,statement)
+ return(df)
+}
 sqlite_df <- function(dbpath,vector){
   require(RSQLite)
   drv <- dbDriver("SQLite")
