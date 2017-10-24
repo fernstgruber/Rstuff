@@ -903,8 +903,10 @@ Modus <- function(x) {
     chosen_df <- as.data.frame(table(allchosen))
     chosen_df <- chosen_df[chosen_df$Freq > 1,]
     chosen_df <- chosen_df[order(chosen_df$Freq,decreasing = TRUE),]
+    if (nrow(chosen_df)>0){
     par(mar=c(10,2,2,2))
     barplot(height=chosen_df$Freq,names.arg = chosen_df$allchosen,las=2,cex.names=0.6)
+      }
     return(chosen_df)
   }
 predict_radial_newlegend_full_naomit <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
