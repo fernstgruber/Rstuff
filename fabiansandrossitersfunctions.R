@@ -767,6 +767,15 @@ altdata <- merge(altdata,legend,all.x=T)
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent_new]])))
 }
 
+increaseacc <- function(modeldata,dependent,pset){
+  require(randomForest)
+  fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,paramsets[[pset]])]),importance=TRUE)
+  print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullmodel$err.rate[nrow(fullmodel$err.rate),1]))
+  importance <- as.data.frame(fullmodel$importance)
+  importance <- importance[order(importance$MeanDecreaseAccuracy,decreasing = T),]
+  print(importance[1:10,])
+}
+
 
 predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,kappasum=FALSE,tausum=FALSE){
   require(e1071)
