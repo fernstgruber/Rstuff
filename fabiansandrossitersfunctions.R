@@ -774,6 +774,7 @@ increaseacc <- function(modeldata,dependent,pset){
   importance <- as.data.frame(fullmodel$importance)
   importance <- importance[order(importance$MeanDecreaseAccuracy,decreasing = T),]
   print(importance[1:10,])
+  return(importance[1:10,])
 }
 
 
