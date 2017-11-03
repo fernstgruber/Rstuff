@@ -774,8 +774,9 @@ increaseacc <- function(modeldata,dependent,pset){
   print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullmodel$err.rate[nrow(fullmodel$err.rate),1]))
   importance <- as.data.frame(fullmodel$importance)
   importance <- importance[order(importance$MeanDecreaseAccuracy,decreasing = T),]
-  kable(importance[1:10,])
+  print(kable(importance[1:10,]))
   return(importance[1:10,])
+   cat('\n')
 }
 
 
