@@ -881,6 +881,7 @@ Modus <- function(x) {
 }
 
   evaluateforwardCV_anyerror <-function(mypath, kk=1:10, endround=5,yrange=c(0.35,0.70),error,geheim) {
+    require(knitr)
     xrange <- c(1,endround)
     yrange=yrange
     plot(xrange,yrange,type="n",xlab="steps",ylab="prediction-error")
@@ -908,10 +909,10 @@ Modus <- function(x) {
       predictor_df[[kname]]<- result_df$metric
       allchosen <-c(allchosen,as.character(result_df$metric))
     }
-    cat("\\newline")
+
     print(paste("Prediction error at end is: ",vcpreds[,"meanprederror"]))
-    cat("\\newline")
-    print(predictor_df)
+
+    kable(predictor_df)
     #as.data.frame(table(allchosen))[order(as.data.frame(table(allchosen))$Freq,decreasing=TRUE),]
     #print(table(allchosen))
     chosen_df <- as.data.frame(table(allchosen))
