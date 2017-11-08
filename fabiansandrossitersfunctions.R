@@ -881,7 +881,6 @@ Modus <- function(x) {
 }
 
   evaluateforwardCV_anyerror <-function(mypath, kk=1:10, endround=5,yrange=c(0.35,0.70),error,geheim) {
-    require(knitr)
     xrange <- c(1,endround)
     yrange=yrange
     plot(xrange,yrange,type="n",xlab="steps",ylab="prediction-error")
@@ -912,7 +911,7 @@ Modus <- function(x) {
 
     print(paste("Prediction error at end is: ",vcpreds[,"meanprederror"]))
 
-    kable(predictor_df)
+    return(predictor_df)
     #as.data.frame(table(allchosen))[order(as.data.frame(table(allchosen))$Freq,decreasing=TRUE),]
     #print(table(allchosen))
     chosen_df <- as.data.frame(table(allchosen))
@@ -922,7 +921,7 @@ Modus <- function(x) {
     par(mar=c(10,2,2,2))
     barplot(height=chosen_df$Freq,names.arg = chosen_df$allchosen,las=2,cex.names=0.6)
       }
-    return(chosen_df)
+   # return(chosen_df)
   }
 predict_radial_newlegend_full_naomit <- function(modeldata,dependent,predictors,legend,doreturn=TRUE){
   require(e1071)
