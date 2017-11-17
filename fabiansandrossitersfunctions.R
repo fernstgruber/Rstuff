@@ -1129,8 +1129,7 @@ summenlinie <- function(x){
   return(sumprops)
 }
 
-    
-    schluff_oe <- function(portions,breaks){
+schluff_oe <- function(portions,breaks){
   breakslog <- log10(breaks)
   y=summenlinie(portions)
   myspline <- spline(breakslog,y,xout=c(seq(from=range(breakslog)[1],
@@ -1143,6 +1142,10 @@ summenlinie <- function(x){
   plot(x=breaks,y=y,type="b")
   lines(x=10^myspline$x[1:10],y=myspline$y[1:10],col="blue")
   splinedf <- as.data.frame(myspline)
-  schluffneu <- splinedf[11,]$y -portions[1]
-  return(schluffneu)
+  u <- round(splinedf[11,]$y -portions[1])
+  t=portions[1]
+  s=100-t-u
+  textur <- c(t,u,s)
+  return(textur)
 }
+
