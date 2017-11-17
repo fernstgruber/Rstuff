@@ -972,3 +972,152 @@ sqlite_df <- function(dbpath,vector){
   df<- dbGetQuery(con,statement)
   return(df)
 }
+
+
+
+geomhist <- function(df,geomcol,outpath,mytitle,...) {
+  ##create geomorphons names dataframe
+  code= c(1:10)
+  geom_names=c("flat","peak","ridge","shoulder","spur","slope","hollow","footslope","valley","pit")
+  n<-geom_names
+  mycols <- c("#e2e0e1","#000000","#c0262a","#d78321","#e7cb3c","#fcea0d","#bfd71c","#82b16b","#3e3ab8","#000000")
+  geomorphons <- as.data.frame(cbind(code,geom_names,mycols))
+  L <- as.data.frame(table(df[[geomcol]]))
+  n <- length(df[[geomcol]])
+  names(L) <- c("code","freq")
+  L$code <- factor(L$code,levels=1:10)
+  L <- merge(L,geomorphons,all.y=TRUE)
+  L <- L[order(L$code),] 
+  L$percentage <- L$freq/n*100
+  #print(L)
+  png(file=paste(outpath,mytitle,".png",sep=""))
+  par(mar=c(5,6,4,2))
+  barplot(L$percentage,col=mycols,names.arg=geom_names,main=mytitle,las=2,ylab="%",ylim=c(0,100),sub=paste("n = ",as.character(n),sep=""))
+  dev.off()
+}
+
+
+
+GB2UTM <- function(df,xcol,ycol) {
+  gbE89Alfa = 0.999981929972442
+  gbE89Beta = -8.08884040434622E-06
+  gbE89P = 82.9213694651314
+  gbE89Q = -1000040.08814668
+  #E = gbE89Q + E(GB) * gbE89Alfa – N(GB) * gbE89Beta
+  #N = gbE89P + N(GB) * gbE89Alfa + E(GB) * gbE89Beta
+  df$x_utm <- gbE89Q + df[[xcol]]*gbE89Alfa - df[[ycol]]*gbE89Beta
+  df$y_utm <- gbE89P + df[[ycol]]*gbE89Alfa + df[[xcol]]*gbE89Beta
+  return(df)
+
+}
+
+printgeomhist <- function(df,geomcol,mytitle,...) {
+  ##create geomorphons names dataframe
+  code= c(1:10)
+  geom_names=c("flat","peak","ridge","shoulder","spur","slope","hollow","footslope","valley","pit")
+  n<-geom_names
+  mycols <- c("#e2e0e1","#000000","#c0262a","#d78321","#e7cb3c","#fcea0d","#bfd71c","#82b16b","#3e3ab8","#000000")
+  geomorphons <- as.data.frame(cbind(code,geom_names,mycols))
+  L <- as.data.frame(table(df[[geomcol]]))
+  n <- length(df[[geomcol]])
+  names(L) <- c("code","freq")
+  L$code <- factor(L$code,levels=1:10)
+  L <- merge(L,geomorphons,all.y=TRUE)
+  L <- L[order(L$code),] 
+  L$percentage <- L$freq/n*100
+  #print(L)
+    par(mar=c(5,6,4,2))
+  barplot(L$percentage,col=mycols,names.arg=geom_names,main=mytitle,las=2,ylab="%",ylim=c(0,100),sub=paste("n = ",as.character(n),sep=""))
+}
+
+textur_oe <- function(t,u) {
+  bodentyp <-character()
+  if(u >= 75) {
+    bodentyp <- "U - Schluff"
+  } else if(t >= 25 && t < 45 && u >= 55 && u < 75){
+    bodentyp <- "uL - schluffiger Lehm"
+  }  else if(t >= 15 && t < 25 && u >= 55 && u < 75){
+    bodentyp <- "lU - lehmiger Schluff"
+  } else if(t >= 0 && t < 15 && u >= 55 && u < 75){
+    bodentyp <- "sU - sandiger Schluff"
+  } else if(t >= 0 && t < 5 && u >= 30 && u < 55){
+    bodentyp <- "uS - schluffiger Sand"
+  } else if(t >= 0 && t < 5 && u >= 0 && u < 30){
+    bodentype <- "S - Sand"
+  } else if(t >= 5 && t < 10 && u >= 0 && u < 10){
+    bodentyp <-   "S - Sand"
+  } else if(t >= 5 && t < 15 && u >= 15 && u < 55){
+    bodentyp <-   "lS - lehmiger Sand"
+  } else if(t >= 10 && t < 15 && u >= 10 && u < 15){
+    bodentyp <-   "lS - lehmiger Sand"
+  } else if(t >= 15 && t < 25 && u >= 10 && u < 55){
+    bodentyp <-   "sL - sandiger Lehm"
+  } else if(t >= 10 && t < 25 && u >= 0 && u < 10){
+    bodentyp <-   "tS - toniger Sand"
+  } else if(t >= 25 && t < 40 && u >= 10 && u < 55){
+    bodentyp <-   "L - Lehm"
+  }else if(t >= 25 && t < 40 && u >= 10 && u < 55){
+    bodentyp <-   "sT - sandiger Ton"
+  }else if(t >= 40 && t < 50 && u >= 0 && u < 55){
+    bodentyp <-   "lT - lehmiger Ton"
+  }else if(t >= 50 && t <= 100 && u >= 0 && u < 50){
+    bodentyp <-   "T - Ton"
+  }else if(t >= 5 && t <= (20-u) && u >= 10 && u < (-1*t+20)){
+    bodentyp <-   "S - Sand"
+  }else if(t >= (20-u) && t <= 10 && u >= (-1*t+20) && u < 15 ){
+    bodentyp <-   "lS - lehmiger Sand"
+  } else {bodentyp <- NA}
+  return(bodentyp)
+}
+
+texturtriangle <- function(t,u,profilename,horizonname){
+  x=c(0,0,100)
+  y=c(0,100,0)
+  postscript(paste("texturdreieck_",profilename,"_",horizonname,".eps",sep=""),horizontal = FALSE)
+  textur <- textur_oe(t,u)
+  par(xaxs="i",yaxs="i",pty="s")
+  plot(x,y,pch=4,cex=0.1,frame.plot = FALSE,ylab="% U",xlab="% T",ylim=c(0,100),xlim=c(0,100))
+  polygon(x=x,y=y)
+  lines(x=c(0,25),y=c(75,75))
+  lines(x=c(0,45),y=c(55,55))
+  lines(x=c(15,15),y=c(10,75))
+  lines(x=c(25,25),y=c(0,75))
+  lines(x=c(50,50),y=c(0,50))
+  lines(x=c(40,40),y=c(0,55))
+  lines(x=c(10,40),y=c(10,10))
+  lines(x=c(10,10),y=c(0,10))
+  lines(x=c(5,10),y=c(15,10))
+  lines(x=c(5,5),y=c(15,55))
+  lines(x=c(0,5),y=c(30,30))
+  text (x=c(6,6,20,30,2.3,10,20,33,45,70,4,16,32),y=c(85,65,65,65,40,30,30,30,30,20,10,5,5),labels=c("U","sU","lU","uL","uS","lS","sL","L","lT","T","S","tS","sT"),cex=0.6)
+  points(x=t,y=u,pch=3,col="red")
+  text(x=65,y=65,labels=paste("Texture of ",profilename," ",horizonname," = ",as.character(textur)))
+  dev.off()
+}
+plottexturtriangle <- function(){
+  x=c(0,0,100)
+  y=c(0,100,0)
+  par(xaxs="i",yaxs="i",pty="s")
+  plot(x,y,pch=4,cex=0.1,frame.plot = FALSE,ylab="% U",xlab="% T",ylim=c(0,100),xlim=c(0,100))
+  polygon(x=x,y=y)
+  lines(x=c(0,25),y=c(75,75))
+  lines(x=c(0,45),y=c(55,55))
+  lines(x=c(15,15),y=c(10,75))
+  lines(x=c(25,25),y=c(0,75))
+  lines(x=c(50,50),y=c(0,50))
+  lines(x=c(40,40),y=c(0,55))
+  lines(x=c(10,40),y=c(10,10))
+  lines(x=c(10,10),y=c(0,10))
+  lines(x=c(5,10),y=c(15,10))
+  lines(x=c(5,5),y=c(15,55))
+  lines(x=c(0,5),y=c(30,30))
+  text (x=c(6,6,20,30,2.3,10,20,33,45,70,4,16,32),y=c(85,65,65,65,40,30,30,30,30,20,10,5,5),labels=c("U","sU","lU","uL","uS","lS","sL","L","lT","T","S","tS","sT"),cex=0.6)
+}
+
+#
+tifs_in_folder <- function(path){
+  allfiles = list.files(path=path)
+  tfw = list.files(path=path,pattern="tfw")
+  aux = list.files(path=path, pattern="aux")
+  tifs = allfiles[!(allfiles %in% c(tfw,aux))]
+}
