@@ -1121,3 +1121,10 @@ tifs_in_folder <- function(path){
   aux = list.files(path=path, pattern="aux")
   tifs = allfiles[!(allfiles %in% c(tfw,aux))]
 }
+summenlinie <- function(x){
+  sumprops <- 1:length(x)
+  for( i in 1:length(x)){
+    sumprops[i] <- sum(x[1:i])
+  }
+  return(sumprops)
+}
