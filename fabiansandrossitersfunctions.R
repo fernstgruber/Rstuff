@@ -1043,7 +1043,7 @@ textur_oe <- function(t,u) {
   } else if(t >= 0 && t < 5 && u >= 30 && u < 55){
     bodentyp <- "uS - schluffiger Sand"
   } else if(t >= 0 && t < 5 && u >= 0 && u < 30){
-    bodentype <- "S - Sand"
+    bodentyp <- "S - Sand"
   } else if(t >= 5 && t < 10 && u >= 0 && u < 10){
     bodentyp <-   "S - Sand"
   } else if(t >= 5 && t < 15 && u >= 15 && u < 55){
