@@ -1140,7 +1140,7 @@ schluff_oe <- function(portions,breaks){
   plot(x=breakslog,y=y,type = "b",ylim=c(0,100))
   lines(myspline$x,myspline$y,col="blue")
   plot(x=breaks,y=y,type="b")
-  lines(x=10^myspline$x[1:10],y=myspline$y[1:10],col="blue")
+  lines(x=10^myspline$x,y=myspline$y[,col="blue")
   splinedf <- as.data.frame(myspline)
   u <- round(splinedf[11,]$y -portions[1])
   t=portions[1]
