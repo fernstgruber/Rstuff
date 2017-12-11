@@ -1132,15 +1132,15 @@ summenlinie <- function(x){
 schluff_oe <- function(portions,breaks){
   breakslog <- log10(breaks)
   y=summenlinie(portions)
-  xout=c(seq(from=range(breakslog)[1],
+  
+  myspline <- spline(breakslog,y,xout=c(seq(from=range(breakslog)[1],
              to=range(breakslog)[2],
-             length.out = 10),log10(0.063))
-  myspline <- spline(breakslog,y,xout=xout[order(xout)])
+             length.out = 10),log10(0.063)))
   par(mfcol=c(1,2))
   plot(x=breakslog,y=y,type = "b",ylim=c(0,100))
   lines(myspline$x,myspline$y,col="blue")
   plot(x=breaks,y=y,type="b")
-  lines(x=10^myspline$x,y=myspline$y[,col="blue")
+  lines(x=10^myspline$x[1:10],y=myspline$y[1:10],col="blue")
   splinedf <- as.data.frame(myspline)
   u <- round(splinedf[11,]$y -portions[1])
   t=portions[1]
