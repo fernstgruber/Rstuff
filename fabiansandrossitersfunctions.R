@@ -780,13 +780,15 @@ increaseacc <- function(modeldata,dependent,pset){
 }
 
 
-predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,kappasum=FALSE,tausum=FALSE){
+predict_radial_full <- function(modeldata,dependent,predictors,doreturn=FALSE,kappasum=FALSE,tausum=FALSE,printpreds=TRUE){
   require(e1071)
   mymodeldata <- modeldata[c(dependent,predictors)]
   f <- paste(dependent,"~.")
   fit <- do.call("svm",list(as.formula(f),mymodeldata,cross=10,kernel="radial"))
   cverror = 1-(fit$tot.accuracy)/100
-  print(paste("10fold cv-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
+  print(paste("10fold cv-error: ",cverror))
+  if(printpreds==TRUE){print(paste("For predictors",paste(predictors,collapse=" AND ")))}
+  
   preds <- predict(fit,mymodeldata)
   CM <- table(preds,mymodeldata[[dependent]])
   print(CM)
