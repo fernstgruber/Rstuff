@@ -730,20 +730,24 @@ predict_radial_newlegend_fullparamset <- function(modeldata,dependent,pset,altda
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent_new]])))
 }
 
-importance_ranfor_pset <- function(modeldata,dependent,pset,altdata){
+importance_ranfor_pset <- function(modeldata,dependent,pset,altdata,withalt=TRUE){
   require(randomForest)
-  fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,paramsets[[pset]])]))
+  predictors = unlist(paramsets[[pset]])
+  predictors = predictors[predictors %in% names(modeldata)]
+  fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,predictors)]),importance=T)
 print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullmodel$err.rate[nrow(fullmodel$err.rate),1]))
  importance <- as.data.frame(fullmodel$importance)
 importance$parameters <- row.names(importance)
-importance <- importance[order(importance$MeanDecreaseGini,decreasing = T),]
-print(importance[1:10,])
-  altmodeldata <- na.omit(altdata[c(dependent,paramsets[[pset]])])
-  altpreddata<-altmodeldata[paramsets[[pset]]]
+importance <- importance[order(importance$MeanDecreaseAccuracy,decreasing = T),]
+print(importance[1:10,c("MeanDecreaseGini","MeanDecreaseAccuracy")])
+if(withalt==TRUE){
+  altmodeldata <- na.omit(altdata[c(dependent,predictors)])
+  altpreddata<-altmodeldata[predictors]
   altpreds <- predict(fullmodel,altpreddata)
   ACM <- table(altpreds, altmodeldata[[dependent]])
   print(ACM)
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
+}
 }
 
 importance_ranfor_pset_newlegend <- function(modeldata,dependent,pset,altdata,legend){
