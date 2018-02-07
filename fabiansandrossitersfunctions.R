@@ -615,7 +615,9 @@ quality <- function(CM){
 
 predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata){
   require(randomForest)
-  fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,paramsets[[pset]])]))
+  predictorsall = unlist(paramsets[[pset]])
+  predictorsall = predictorsall[predictorsall %in% names(modeldata)]
+  fullmodel <- randomForest(as.formula(paste(dependent,"~.")),na.omit(modeldata[c(dependent,predictorsall)]),importance=T)
 print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullmodel$err.rate[nrow(fullmodel$err.rate),1]))
   mymodeldata <- modeldata[c(dependent,predictors)]
   f <- paste(dependent,"~.")
