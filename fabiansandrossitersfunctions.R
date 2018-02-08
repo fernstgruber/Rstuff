@@ -627,9 +627,9 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   print("confusion OOB")
   print(fit$confusion)
   preddata <- mymodeldata[,!names(mymodeldata)%in% c(dependent)]
-  #preds <- predict(fit,preddata)
-  #CM <- table(preds,mymodeldata[[dependent]])
-  #print(CM)
+  preds <- predict(fit,preddata)
+  CM <- table(preds,mymodeldata[[dependent]])
+  print(CM)
   print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
   if(kappasum==T) print(summary.kappa(kappa(CM)))
   print(paste("Tau overall = ",tau(CM)$tau))
