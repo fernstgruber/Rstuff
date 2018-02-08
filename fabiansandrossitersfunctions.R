@@ -613,7 +613,7 @@ quality <- function(CM){
   return(mean_quality)
 }
 
-predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata){
+predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata,withalt=FALSE){
   require(randomForest)
   predictorsall = unlist(paramsets[[pset]])
   predictorsall = predictorsall[predictorsall %in% names(modeldata)]
@@ -624,10 +624,12 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   fit <- do.call("randomForest",list(as.formula(f),mymodeldata))
   cverror =  fit$err.rate[nrow(fit$err.rate),1]
   print(paste("OOB-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
+  print("confusion OOB")
+  print(fit$confusion)
   preddata <- mymodeldata[,!names(mymodeldata)%in% c(dependent)]
-  preds <- predict(fit,preddata)
-  CM <- table(preds,mymodeldata[[dependent]])
-  print(CM)
+  #preds <- predict(fit,preddata)
+  #CM <- table(preds,mymodeldata[[dependent]])
+  #print(CM)
   print(paste("Kappa overall = ",kappa(CM)$sum.kappa))
   if(kappasum==T) print(summary.kappa(kappa(CM)))
   print(paste("Tau overall = ",tau(CM)$tau))
@@ -635,11 +637,13 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   print(paste("The quality is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
   if(doreturn==TRUE) return(preds)
+  if(withalt==TRUE){
    altmodeldata <- na.omit(altdata[c(dependent,predictors)])
   altpreddata<-altmodeldata[predictors]
   altpreds <- predict(fit,altpreddata)
   ACM <- table(altpreds, altmodeldata[[dependent]])
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent]])))
+    }
 }
 
 predict_ranfor_newlegend_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,altdata,legend){
