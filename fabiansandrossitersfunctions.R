@@ -747,7 +747,9 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
  importance <- as.data.frame(fullmodel$importance)
 importance$parameters <- row.names(importance)
 importance <- importance[order(importance$MeanDecreaseAccuracy,decreasing = T),]
-print(importance[1:10,c("MeanDecreaseGini","MeanDecreaseAccuracy")])
+importance$MDA <- importance$MeanDecreaseAccuracy
+importance$MDG <- importance$MeanDecreaseGini
+print(importance[1:10,c("MDA","MDG")])
 if(withalt==TRUE){
   altmodeldata <- na.omit(altdata[c(dependent,predictors)])
   altpreddata<-altmodeldata[predictors]
