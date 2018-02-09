@@ -613,7 +613,7 @@ quality <- function(CM){
   return(mean_quality)
 }
 
-predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata,withalt=FALSE){
+predict_ranfor_full <- function(modeldata,dependent,predictors,doreturn=FALSE, kappasum=FALSE,tausum=FALSE,pset,altdata,withalt=FALSE,withmodelconfusion=FALSE){
   require(randomForest)
   predictorsall = unlist(paramsets[[pset]])
   predictorsall = predictorsall[predictorsall %in% names(modeldata)]
@@ -626,6 +626,7 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   print(paste("OOB-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
   print("confusion OOB")
   print(fit$confusion)
+  if(withmodelconfusion=TRUE){
   preddata <- mymodeldata[,!names(mymodeldata)%in% c(dependent)]
   preds <- predict(fit,preddata)
   CM <- table(preds,mymodeldata[[dependent]])
@@ -636,6 +637,7 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   if(tausum == T) print(summary.tau(tau(CM)))
   print(paste("The quality is ",quality(CM)))
   print(paste("#########  Cramer's V = ",Cramer(CM)))
+    }
   if(doreturn==TRUE) return(preds)
   if(withalt==TRUE){
    altmodeldata <- na.omit(altdata[c(dependent,predictors)])
