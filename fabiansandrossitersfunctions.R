@@ -738,7 +738,7 @@ predict_radial_newlegend_fullparamset <- function(modeldata,dependent,pset,altda
   print(paste("classification error rate with altdata: ",mean(altpreds != altmodeldata[[dependent_new]])))
 }
 
-importance_ranfor_pset <- function(modeldata,dependent,pset,altdata,withalt=TRUE){
+importance_ranfor_pset <- function(modeldata,dependent,pset,altdata,withalt=TRUE,returnimportance=FALSE){
   require(randomForest)
   predictors = unlist(paramsets[[pset]])
   predictors = predictors[predictors %in% names(modeldata)]
@@ -749,6 +749,9 @@ importance$parameters <- row.names(importance)
 importance <- importance[order(importance$MeanDecreaseAccuracy,decreasing = T),]
 importance$MDA <- importance$MeanDecreaseAccuracy
 importance$MDG <- importance$MeanDecreaseGini
+ if(returnimportance==TRUE){
+   return(importance)
+   }
 print(importance[1:10,c("MDA","MDG")])
 if(withalt==TRUE){
   altmodeldata <- na.omit(altdata[c(dependent,predictors)])
