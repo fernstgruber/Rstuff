@@ -626,7 +626,7 @@ print(paste("OBB error with all predictors of ",paramsetnames[pset], "is ",fullm
   print(paste("OOB-error: ",cverror," for predictors",paste(predictors,collapse=" AND ")))
   print("confusion OOB")
   print(fit$confusion)
-  if(withmodelconfusion=TRUE){
+  if(withmodelconfusion==TRUE){
   preddata <- mymodeldata[,!names(mymodeldata)%in% c(dependent)]
   preds <- predict(fit,preddata)
   CM <- table(preds,mymodeldata[[dependent]])
