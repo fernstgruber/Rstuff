@@ -1188,7 +1188,7 @@ geombarplot <- function(geomcol,thema,einheit,data,...){
   par(mar=c(0.5,3,0.5,0))
   barplot(L$freqrel,col=mycols,cex.main=0.5,las=2,ylab="%",ylim=c(0,100),cex.axis = 0.6,cex.lab=0.7, mgp=c(2, 1, 0),main=paste(rdata,sep=""),cex.main=0.8)
 }
-parameterboxplots <- function(origmodeldata,preddata, dependent,parameter){
+parameterboxplots <- function(origmodeldata,preddata, dependent,parameter,rdata){
   ylim=c(summary(origmodeldata[[parameter]])[1],summary(origmodeldata[[parameter]])[6])
   ylim2=c(summary(preddata[[parameter]])[1],summary(preddata[[parameter]])[6])
   
