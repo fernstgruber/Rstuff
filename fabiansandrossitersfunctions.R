@@ -1168,7 +1168,7 @@ schluff_oe <- function(portions,breaks){
   return(textur)
 }
 
-geombarplot <- function(geomcol,thema,einheit,data,...){
+geombarplot <- function(geomcol,thema,einheit,data,rdata,...){
   code= c(1:10)
   geom_names=c("flat","peak","ridge","shoulder","spur","slope","hollow","footslope","valley","pit")
   n<-geom_names
